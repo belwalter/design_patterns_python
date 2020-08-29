@@ -1,4 +1,3 @@
-from __future__ import annotations
 from abc import ABC, abstractmethod
 
 
@@ -12,11 +11,15 @@ class AbstractFactory(ABC):
     another.
     """
     @abstractmethod
-    def create_product_a(self) -> AbstractProductA:
+    def create_product_a(self):
         pass
 
     @abstractmethod
-    def create_product_b(self) -> AbstractProductB:
+    def create_product_b(self):
+        pass
+
+    @abstractmethod
+    def create_product_c(self):
         pass
 
 
@@ -28,11 +31,14 @@ class ConcreteFactory1(AbstractFactory):
     product, while inside the method a concrete product is instantiated.
     """
 
-    def create_product_a(self) -> ConcreteProductA1:
+    def create_product_a(self):
         return ConcreteProductA1()
 
-    def create_product_b(self) -> ConcreteProductB1:
+    def create_product_b(self):
         return ConcreteProductB1()
+    
+    def create_product_c(self):
+        return ConcreteProductC1()
 
 
 class ConcreteFactory2(AbstractFactory):
@@ -40,11 +46,14 @@ class ConcreteFactory2(AbstractFactory):
     Each Concrete Factory has a corresponding product variant.
     """
 
-    def create_product_a(self) -> ConcreteProductA2:
+    def create_product_a(self):
         return ConcreteProductA2()
 
-    def create_product_b(self) -> ConcreteProductB2:
+    def create_product_b(self):
         return ConcreteProductB2()
+    
+    def create_product_c(self):
+        return ConcreteProductC2()
 
 
 class AbstractProductA(ABC):
@@ -54,7 +63,18 @@ class AbstractProductA(ABC):
     """
 
     @abstractmethod
-    def useful_function_a(self) -> str:
+    def useful_function_a(self):
+        pass
+
+
+class AbstractProductC(ABC):
+    """
+    Each distinct product of a product family should have a base interface. All
+    variants of the product must implement this interface.
+    """
+
+    @abstractmethod
+    def useful_function_c(self):
         pass
 
 
@@ -64,14 +84,23 @@ Concrete Products are created by corresponding Concrete Factories.
 
 
 class ConcreteProductA1(AbstractProductA):
-    def useful_function_a(self) -> str:
+    def useful_function_a(self):
         return "The result of the product A1."
 
 
 class ConcreteProductA2(AbstractProductA):
-    def useful_function_a(self) -> str:
+    def useful_function_a(self):
         return "The result of the product A2."
 
+
+class ConcreteProductC1(AbstractProductC):
+    def useful_function_c(self):
+        return "The result of the product C1."
+
+
+class ConcreteProductC2(AbstractProductC):
+    def useful_function_c(self):
+        return "The result of the product C2."
 
 class AbstractProductB(ABC):
     """
@@ -80,14 +109,14 @@ class AbstractProductB(ABC):
     the same concrete variant.
     """
     @abstractmethod
-    def useful_function_b(self) -> None:
+    def useful_function_b(self):
         """
         Product B is able to do its own thing...
         """
         pass
 
     @abstractmethod
-    def another_useful_function_b(self, collaborator: AbstractProductA) -> None:
+    def another_useful_function_b(self, collaborator):
         """
         ...but it also can collaborate with the ProductA.
 
@@ -103,7 +132,7 @@ Concrete Products are created by corresponding Concrete Factories.
 
 
 class ConcreteProductB1(AbstractProductB):
-    def useful_function_b(self) -> str:
+    def useful_function_b(self):
         return "The result of the product B1."
 
     """
@@ -112,16 +141,16 @@ class ConcreteProductB1(AbstractProductB):
     argument.
     """
 
-    def another_useful_function_b(self, collaborator: AbstractProductA) -> str:
+    def another_useful_function_b(self, collaborator):
         result = collaborator.useful_function_a()
         return f"The result of the B1 collaborating with the ({result})"
 
 
 class ConcreteProductB2(AbstractProductB):
-    def useful_function_b(self) -> str:
+    def useful_function_b(self):
         return "The result of the product B2."
 
-    def another_useful_function_b(self, collaborator: AbstractProductA):
+    def another_useful_function_b(self, collaborator):
         """
         The variant, Product B2, is only able to work correctly with the
         variant, Product A2. Nevertheless, it accepts any instance of
@@ -131,7 +160,7 @@ class ConcreteProductB2(AbstractProductB):
         return f"The result of the B2 collaborating with the ({result})"
 
 
-def client_code(factory: AbstractFactory) -> None:
+def client_code(factory: AbstractFactory):
     """
     The client code works with factories and products only through abstract
     types: AbstractFactory and AbstractProduct. This lets you pass any factory
@@ -139,9 +168,11 @@ def client_code(factory: AbstractFactory) -> None:
     """
     product_a = factory.create_product_a()
     product_b = factory.create_product_b()
+    product_c = factory.create_product_c()
 
     print(f"{product_b.useful_function_b()}")
     print(f"{product_b.another_useful_function_b(product_a)}", end="")
+    print(product_c)
 
 
 if __name__ == "__main__":
